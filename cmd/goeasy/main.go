@@ -43,7 +43,7 @@ var templateFS embed.FS
 func main() {
 	templateFS = goembed.TemplateFS
 
-	moduleFlag := flag.String("module", "github.com/username/golan_project", "Go module name (e.g. github.com/user/project)")
+	moduleFlag := flag.String("module", "github.com/username/golang_project", "Go module name (e.g. github.com/user/project)")
 
 	var entities stringSlice
 
@@ -61,6 +61,9 @@ func main() {
 	// Define directories
 	dirs := []string{
 		"cmd/server",
+		"docs",
+		"docs/swagger",
+		"docs/api",
 		"internal/interface/http/v1/handlers",
 		"internal/interface/http/v1/routes",
 		"internal/interface/http/v1/dto",
@@ -199,6 +202,9 @@ func createStructure(entityName, moduleName, projectRoot string) {
 		{Path: "internal/interface/http/v1/dto/response.go", Package: "dto", TemplateName: ""},
 
 		{Path: "pkg/db/db.go", Package: "db", TemplateName: "db.tmpl"},
+
+		{Path: ".gitignore", Package: "", TemplateName: ""},
+		{Path: "Dockerfile", Package: "", TemplateName: ""},
 	}
 
 	// Create files
