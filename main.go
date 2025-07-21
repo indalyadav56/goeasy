@@ -62,6 +62,7 @@ func main() {
 		"internal/interface/http/v1/handlers",
 		"internal/interface/http/v1/routes",
 		"internal/interface/http/v1/dto",
+		"internal/interface/http/v1/middlewares",
 		"internal/interface/grpc",
 		"internal/application/services",
 		"internal/domain/entity",
