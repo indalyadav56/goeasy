@@ -5,5 +5,5 @@ A CLI tool that generates Domain-Driven Design (DDD) Go service modules with bes
 ## Installation
 
 ```bash
-go install github.com/indalyadav56/goeasy/cmd/goeasy@latest
+go install github.com/indalyadav56/goeasy/cmd/gogen@latest
 ```
