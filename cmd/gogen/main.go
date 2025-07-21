@@ -10,8 +10,8 @@ import (
 	"strings"
 	"text/template"
 
-	goembed "github.com/indalyadav56/goeasy"
-	"github.com/indalyadav56/goeasy/utils"
+	goembed "github.com/indalyadav56/gogen"
+	"github.com/indalyadav56/gogen/utils"
 )
 
 type stringSlice []string
