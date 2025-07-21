@@ -1,13 +1,9 @@
-GoEasy
-A CLI tool to generate Domain-Driven Design (DDD) Go service modules.
-Usage
-goeasy -generate <module-name>
+# GoEasy
 
-Example:
-goeasy -generate auth-service
+A CLI tool that generates Domain-Driven Design (DDD) Go service modules with best practices and common patterns.
 
-Structure
+## Installation
 
-/cmd/goeasy: CLI entry point
-/internal/generator: Core generation logic
-/internal/templates: File templates
+```bash
+go install github.com/indalyadav56/goeasy/cmd/goeasy@latest
+```

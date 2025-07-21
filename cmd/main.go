@@ -10,6 +10,7 @@ import (
 	"strings"
 	"text/template"
 
+	goembed "github.com/indalyadav56/goeasy"
 	"github.com/indalyadav56/goeasy/utils"
 )
 
@@ -37,10 +38,11 @@ type TemplateData struct {
 	EntityName  string
 }
 
-//go:embed templates/*.tmpl
 var templateFS embed.FS
 
 func main() {
+	templateFS = goembed.TemplateFS
+
 	moduleFlag := flag.String("module", "github.com/username/golan_project", "Go module name (e.g. github.com/user/project)")
 
 	var entities stringSlice
@@ -188,6 +190,8 @@ func createStructure(entityName, moduleName, projectRoot string) {
 		{Path: "internal/application/services/service.go", Package: "services", TemplateName: "service.tmpl"},
 		{Path: "internal/interface/http/v1/routes/routes.go", Package: "routes", TemplateName: "routes.tmpl"},
 		{Path: "internal/interface/http/v1/handlers/handler.go", Package: "handlers", TemplateName: "handler.tmpl"},
+		{Path: "internal/interface/http/v1/middlewares/auth_middleware.go", Package: "middlewares"},
+
 		{Path: "internal/infrastructure/postgres/postgres.go", Package: "postgres", TemplateName: "postgres_repository.tmpl"},
 
 		// DTO
