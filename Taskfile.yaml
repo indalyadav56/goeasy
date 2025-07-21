@@ -3,9 +3,9 @@ version: "3"
 tasks:
   run:
     cmds:
-      - go run cmd/goeasy/main.go --module github.com/indalyadav/example-project --entity user
+      - go run cmd/gogen/main.go --module github.com/indalyadav/example-project --entity user
   build:
-    cmd: go build -o goeasy ./cmd/goeasy
+    cmd: go build -o gogen ./cmd/gogen
 
   swagger:
     cmds:
