@@ -1,0 +1,53 @@
+package services
+
+import (
+	"context"
+	"log/slog"
+
+	"{{.ModuleName}}/internal/domain/repository"
+	"{{.ModuleName}}/internal/domain/entity"
+)
+
+type {{.EntityName | ToPascalCase}}Service interface {
+	Create(item *entity.{{.EntityName | ToPascalCase}}) (*entity.{{.EntityName | ToPascalCase}}, error)
+	GetByID(id string) (*entity.{{.EntityName | ToPascalCase}}, error)
+	Update(id string, item *entity.{{.EntityName | ToPascalCase}}) (*entity.{{.EntityName | ToPascalCase}}, error)
+	Delete(id string) error
+}
+
+type {{.EntityName | ToCamelCase}}Service struct {
+	repo repository.{{.EntityName | ToPascalCase}}Repository
+}
+
+func New{{.EntityName | ToPascalCase}}Service(repo repository.{{.EntityName | ToPascalCase}}Repository) {{.EntityName | ToPascalCase}}Service {
+	return &{{.EntityName | ToCamelCase}}Service{
+		repo: repo,
+	}
+}
+
+func (s *{{.EntityName | ToCamelCase}}Service) Create(item *entity.{{.EntityName | ToPascalCase}}) (*entity.{{.EntityName | ToPascalCase}}, error) {
+	slog.Info("creating user")
+	err := s.repo.Insert(context.Background(), item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
+
+func (s *{{.EntityName | ToCamelCase}}Service) GetByID(id string) (*entity.{{.EntityName | ToPascalCase}}, error) {
+	return s.repo.FindByID(context.Background(), id)
+}
+
+func (s *{{.EntityName | ToCamelCase}}Service) Update(id string, item *entity.{{.EntityName | ToPascalCase}}) (*entity.{{.EntityName | ToPascalCase}}, error) {
+	err := s.repo.Update(context.Background(), item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
+
+func (s *{{.EntityName | ToCamelCase}}Service) Delete(id string) error {
+	return s.repo.Delete(context.Background(), id)
+}

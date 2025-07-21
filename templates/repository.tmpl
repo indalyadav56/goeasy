@@ -1,0 +1,13 @@
+package repository
+
+import (
+	"context"
+	"{{.ModuleName}}/internal/domain/entity"
+)
+
+type {{.EntityName | ToPascalCase}}Repository interface {
+	Insert(ctx context.Context, entity *entity.{{.EntityName | ToPascalCase}}) error
+	FindByID(ctx context.Context, id string) (*entity.{{.EntityName | ToPascalCase}}, error)
+	Update(ctx context.Context, entity *entity.{{.EntityName | ToPascalCase}}) error
+	Delete(ctx context.Context, id string) error
+}

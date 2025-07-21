@@ -1,0 +1,33 @@
+version: "3"
+
+tasks:
+  run:
+    cmds:
+      - go run main.go --module github.com/indalyadav/example-project --entity user
+  build:
+    cmd: go build -o goeasy .
+
+  swagger:
+    cmds:
+      - swag init -g ./cmd/main.go -o ./docs/swagger
+
+  test:
+    cmds:
+      - go test -v ./...
+
+  benchmark:
+    cmds:
+      - go test -bench=. ./...
+
+  test-coverage:
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out
+
+  lint:
+    cmds:
+      - golangci-lint run
+
+  lint-fix:
+    cmds:
+      - golangci-lint run --fix

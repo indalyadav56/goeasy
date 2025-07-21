@@ -1,0 +1,47 @@
+package {{.Package}}
+
+import (
+	"net/http"
+	"{{.ModuleName}}/internal/application/services"
+)
+
+type {{.EntityName | ToPascalCase}}Handler interface {
+	Create{{.EntityName | ToPascalCase}}(w http.ResponseWriter, r *http.Request)
+	Get{{.EntityName | ToPascalCase}}(w http.ResponseWriter, r *http.Request)
+	Update{{.EntityName | ToPascalCase}}(w http.ResponseWriter, r *http.Request)
+	Delete{{.EntityName | ToPascalCase}}(w http.ResponseWriter, r *http.Request)
+	List{{.EntityName | ToPascalCase}}s(w http.ResponseWriter, r *http.Request)
+}
+
+type {{.EntityName | ToCamelCase}}Handler struct {
+	service services.{{.EntityName | ToPascalCase}}Service
+}
+
+func New{{.EntityName | ToPascalCase}}Handler(service services.{{.EntityName | ToPascalCase}}Service) {{.EntityName | ToPascalCase}}Handler {
+	return &{{.EntityName | ToCamelCase}}Handler{
+		service: service,
+	}
+}
+
+func (h *{{.EntityName | ToCamelCase}}Handler) Create{{.EntityName | ToPascalCase}}(w http.ResponseWriter, r *http.Request) {
+	
+}
+
+
+func (h *{{.EntityName | ToCamelCase}}Handler) Get{{.EntityName | ToPascalCase}}(w http.ResponseWriter, r *http.Request) {
+	
+}
+
+
+func (h *{{.EntityName | ToCamelCase}}Handler) Update{{.EntityName | ToPascalCase}}(w http.ResponseWriter, r *http.Request) {
+	
+}
+
+
+func (h *{{.EntityName | ToCamelCase}}Handler) Delete{{.EntityName | ToPascalCase}}(w http.ResponseWriter, r *http.Request) {
+	
+}
+
+func (h *{{.EntityName | ToCamelCase}}Handler) List{{.EntityName | ToPascalCase}}s(w http.ResponseWriter, r *http.Request) {
+	
+}

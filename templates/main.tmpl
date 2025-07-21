@@ -1,0 +1,45 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"github.com/go-chi/chi/v5"
+	"{{.ModuleName}}/pkg/db"
+	"{{.ModuleName}}/pkg/logger"
+	"{{.ModuleName}}/internal/interface/http/v1/routes"
+	"{{.ModuleName}}/internal/interface/http/v1/handlers"
+	"{{.ModuleName}}/internal/application/services"
+	"{{.ModuleName}}/internal/infrastructure/postgres"
+)
+
+func main() {
+	// init db
+	dbConn, err := db.InitDB()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer dbConn.Close()
+
+	// init logger
+	logger.InitLogger()
+
+	// init router
+	r := chi.NewRouter()
+
+	// repo
+	repo := postgres.NewPostgresRepository(dbConn)
+
+	// services
+	s := services.New{{.EntityName | ToPascalCase}}Service(repo)
+
+	// init handlers
+	h := handlers.New{{.EntityName | ToPascalCase}}Handler(s)
+
+	// register routes
+	routes.RegisterRoutes(r, h)
+
+	// start server
+	fmt.Println("Server is running on :8080")
+	http.ListenAndServe(":8080", r)
+}
+

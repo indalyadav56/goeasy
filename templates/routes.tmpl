@@ -1,0 +1,15 @@
+package routes
+
+import (
+	"github.com/go-chi/chi/v5"
+	"{{.ModuleName}}/internal/interface/http/v1/handlers"
+)
+
+func RegisterRoutes(r chi.Router, h handlers.{{.EntityName | ToPascalCase}}Handler) {
+	r.Route("/v1/{{.EntityName | ToLower}}", func(r chi.Router) {
+		r.Get("/", h.Get{{.EntityName | ToPascalCase}})
+		r.Post("/", h.Create{{.EntityName | ToPascalCase}})
+		r.Put("/{id}", h.Update{{.EntityName | ToPascalCase}})
+		r.Delete("/{id}", h.Delete{{.EntityName | ToPascalCase}})
+	})
+}
