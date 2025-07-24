@@ -7,10 +7,6 @@ tasks:
   build:
     cmd: go build -o gogen ./cmd/gogen
 
-  swagger:
-    cmds:
-      - swag init -g ./cmd/main.go -o ./docs/swagger
-
   test:
     cmds:
       - go test -v ./...
