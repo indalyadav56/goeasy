@@ -5,7 +5,7 @@ A CLI tool that generates Domain-Driven Design (DDD) Go service modules with bes
 ## Installation
 
 ```bash
-go install github.com/indalyadav56/gogen/cmd/gogen@latest
+go install github.com/indalyadav56/gogen/cmd/gogen@v1.0.5
 ```
 
 ## Run
