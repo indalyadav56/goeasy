@@ -67,7 +67,7 @@ func main() {
 		"internal/interface/http/v1/handlers",
 		"internal/interface/http/v1/routes",
 		"internal/interface/http/v1/dto",
-		"internal/interface/http/v1/middlewares",
+		"internal/interface/http/middlewares",
 		"internal/interface/grpc",
 		"internal/application/services",
 		"internal/domain/entity",
@@ -75,6 +75,7 @@ func main() {
 		"internal/domain/repository",
 		"internal/infrastructure",
 		"internal/infrastructure/postgres",
+		"internal/infrastructure/postgres/migrations",
 		"config",
 		"pkg/logger",
 		"pkg/db",
@@ -190,10 +191,10 @@ func createStructure(entityName, moduleName, projectRoot string) {
 		{Path: "internal/domain/entity/entity.go", Package: "entity", TemplateName: "entity.tmpl"},
 		{Path: "internal/domain/repository/repository.go", Package: "repository", TemplateName: "repository.tmpl"},
 
-		{Path: "internal/application/services/service.go", Package: "services", TemplateName: "service.tmpl"},
+		{Path: "internal/application/services/" + fmt.Sprintf("%s_service.go", strings.ToLower(entityName)), Package: "services", TemplateName: "service.tmpl"},
 		{Path: "internal/interface/http/v1/routes/routes.go", Package: "routes", TemplateName: "routes.tmpl"},
-		{Path: "internal/interface/http/v1/handlers/handler.go", Package: "handlers", TemplateName: "handler.tmpl"},
-		{Path: "internal/interface/http/v1/middlewares/auth_middleware.go", Package: "middlewares"},
+		{Path: "internal/interface/http/v1/handlers/" + fmt.Sprintf("%s_handler.go", strings.ToLower(entityName)), Package: "handlers", TemplateName: "handler.tmpl"},
+		{Path: "internal/interface/http/middlewares/auth_middleware.go", Package: "middlewares"},
 
 		{Path: "internal/infrastructure/postgres/postgres.go", Package: "postgres", TemplateName: "postgres_repository.tmpl"},
 

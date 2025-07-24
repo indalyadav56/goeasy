@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"{{.ModuleName}}/pkg/db"
 	"{{.ModuleName}}/pkg/logger"
 	"{{.ModuleName}}/internal/interface/http/v1/routes"
@@ -25,6 +26,9 @@ func main() {
 
 	// init router
 	r := chi.NewRouter()
+
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Logger)
 
 	// repo
 	repo := postgres.NewPostgresRepository(dbConn)
