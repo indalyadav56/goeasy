@@ -145,10 +145,14 @@ func renderTemplateToFile(templatePath, outputPath string, data any) error {
 		},
 	}
 
+	// Ensure template path uses forward slashes for embedded filesystem
+	// This is important for cross-platform compatibility (especially Windows)
+	templatePathNormalized := strings.ReplaceAll(templatePath, "\\", "/")
+
 	// Read template content from embedded filesystem
-	templateContent, err := templateFS.ReadFile(templatePath)
+	templateContent, err := templateFS.ReadFile(templatePathNormalized)
 	if err != nil {
-		return fmt.Errorf("failed to read embedded template file %s: %w", templatePath, err)
+		return fmt.Errorf("failed to read embedded template file %s: %w", templatePathNormalized, err)
 	}
 
 	// Parse template from content with custom functions
@@ -222,12 +226,14 @@ func createStructure(entityName, moduleName, projectRoot string) {
 
 		// If a template is specified, render it
 		if f.TemplateName != "" && entityName != "" {
-			templatePath := filepath.Join("templates", f.TemplateName)
+			// Use forward slashes for embedded filesystem paths
+			templatePath := "templates/" + f.TemplateName
 			if err := renderTemplateToFile(templatePath, fullPath, templateData); err != nil {
 				exitWithError(fmt.Errorf("failed to render template %s: %w", f.TemplateName, err))
 			}
 		} else if f.TemplateName == "db.tmpl" || f.TemplateName == "logger.tmpl" {
-			templatePath := filepath.Join("templates", f.TemplateName)
+			// Use forward slashes for embedded filesystem paths
+			templatePath := "templates/" + f.TemplateName
 			if err := renderTemplateToFile(templatePath, fullPath, templateData); err != nil {
 				exitWithError(fmt.Errorf("failed to render template %s: %w", f.TemplateName, err))
 			}
