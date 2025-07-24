@@ -13,3 +13,7 @@ go install github.com/indalyadav56/gogen/cmd/gogen@latest
 ```bash
 go run cmd/gogen/main.go --module github.com/indalyadav/example-project --entity user
 ```
+
+## screenshots
+
+![screenshot](./screenshots/image.png)
