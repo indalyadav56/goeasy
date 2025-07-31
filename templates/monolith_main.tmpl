@@ -7,10 +7,14 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"{{.ModuleName}}/pkg/db"
 	"{{.ModuleName}}/pkg/logger"
+	{{if .IsMonolith}}
+	"{{.HandlerImport}}"
+	{{else}}
 	"{{.ModuleName}}/internal/interface/http/v1/routes"
 	"{{.ModuleName}}/internal/interface/http/v1/handlers"
-	"{{.ModuleName}}/internal/application"
+	"{{.ModuleName}}/internal/application/services"
 	"{{.ModuleName}}/internal/infrastructure/postgres"
+	{{end}}
 )
 
 func main() {
@@ -28,22 +32,14 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.Logger)
 
-	// repo
-	repo := postgres.NewPostgresRepository(dbConn)
+	{{if .IsMonolith}}
+	
+	{{else}}
+	// Microservice routes
+	r.Mount("/api", routes.Routes())
+	{{end}}
 
-	// services
-	s := application.New{{.EntityName | ToPascalCase}}Service(repo)
-
-	// init handlers
-	h := handlers.New{{.EntityName | ToPascalCase}}Handler(s)
-
-	// register routes
-	routes.RegisterRoutes(r, h)
-
-	// start server
-	fmt.Println("Server is running on :8080")
+	fmt.Println("Server starting on :8080")
 	http.ListenAndServe(":8080", r)
 }
-

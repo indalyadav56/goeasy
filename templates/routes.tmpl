@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/go-chi/chi/v5"
-	"{{.ModuleName}}/internal/interface/http/v1/handlers"
+	"{{.HandlerImport}}"
 )
 
 func RegisterRoutes(r chi.Router, h handlers.{{.EntityName | ToPascalCase}}Handler) {

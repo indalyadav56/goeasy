@@ -1,11 +1,11 @@
-package services
+package application
 
 import (
 	"context"
 	"log/slog"
 
-	"{{.ModuleName}}/internal/domain/repository"
-	"{{.ModuleName}}/internal/domain/entity"
+	"{{.RepositoryImport}}"
+	"{{.EntityImport}}"
 )
 
 type {{.EntityName | ToPascalCase}}Service interface {

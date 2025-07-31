@@ -2,7 +2,7 @@ package {{.Package}}
 
 import (
 	"net/http"
-	"{{.ModuleName}}/internal/application/services"
+	"{{.ServiceImport}}"
 )
 
 type {{.EntityName | ToPascalCase}}Handler interface {
@@ -14,10 +14,10 @@ type {{.EntityName | ToPascalCase}}Handler interface {
 }
 
 type {{.EntityName | ToCamelCase}}Handler struct {
-	service services.{{.EntityName | ToPascalCase}}Service
+	service application.{{.EntityName | ToPascalCase}}Service
 }
 
-func New{{.EntityName | ToPascalCase}}Handler(service services.{{.EntityName | ToPascalCase}}Service) {{.EntityName | ToPascalCase}}Handler {
+func New{{.EntityName | ToPascalCase}}Handler(service application.{{.EntityName | ToPascalCase}}Service) {{.EntityName | ToPascalCase}}Handler {
 	return &{{.EntityName | ToCamelCase}}Handler{
 		service: service,
 	}
