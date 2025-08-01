@@ -89,7 +89,7 @@ func (pg *ProjectGenerator) createDirectoriesForEntity(entityName string) error 
 
 // generateFiles generates all project files
 func (pg *ProjectGenerator) generateFiles() error {
-	fileGenerator := scaffold.NewFileGenerator(pg.renderer, pg.projectRoot, pg.config.ModuleName, pg.config.Monolith, pg.config.UseGin, pg.config.Entities)
+	fileGenerator := scaffold.NewFileGenerator(pg.renderer, pg.projectRoot, pg.config.ModuleName, pg.config.Monolith, pg.config.UseGin, pg.config.UseAuth, pg.config.Entities)
 	
 	if len(pg.config.Entities) > 0 {
 		for _, entityName := range pg.config.Entities {

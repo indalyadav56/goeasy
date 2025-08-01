@@ -18,7 +18,7 @@ func TestNewFileGenerator(t *testing.T) {
 	useGin := false
 	entities := []string{"user"}
 
-	fg := NewFileGenerator(renderer, projectRoot, moduleName, isMonolith, useGin, entities)
+	fg := NewFileGenerator(renderer, projectRoot, moduleName, isMonolith, useGin, false, entities)
 
 	if fg == nil {
 		t.Error("NewFileGenerator() returned nil")
@@ -40,7 +40,7 @@ func TestNewFileGenerator(t *testing.T) {
 func TestFileGenerator_GetMicroserviceFileList(t *testing.T) {
 	var mockFS embed.FS
 	renderer := template.NewRenderer(mockFS)
-	fg := NewFileGenerator(renderer, "/test", "github.com/test/project", false, false, []string{"user"})
+	fg := NewFileGenerator(renderer, "/test", "github.com/test/project", false, false, false, []string{"user"})
 
 	files := fg.getMicroserviceFileList("user")
 
@@ -75,7 +75,7 @@ func TestFileGenerator_GetMicroserviceFileList(t *testing.T) {
 func TestFileGenerator_GetMonolithFileList(t *testing.T) {
 	var mockFS embed.FS
 	renderer := template.NewRenderer(mockFS)
-	fg := NewFileGenerator(renderer, "/test", "github.com/test/project", true, false, []string{"user"})
+	fg := NewFileGenerator(renderer, "/test", "github.com/test/project", true, false, false, []string{"user"})
 
 	files := fg.getMonolithFileList("user")
 
@@ -132,7 +132,7 @@ func TestFileGenerator_GetHandlerTemplate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var mockFS embed.FS
 			renderer := template.NewRenderer(mockFS)
-			fg := NewFileGenerator(renderer, "/test", "github.com/test/project", false, tt.useGin, []string{"user"})
+			fg := NewFileGenerator(renderer, "/test", "github.com/test/project", false, tt.useGin, false, []string{"user"})
 
 			result := fg.getHandlerTemplate()
 			if result != tt.expected {
@@ -164,7 +164,7 @@ func TestFileGenerator_GetRoutesTemplate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var mockFS embed.FS
 			renderer := template.NewRenderer(mockFS)
-			fg := NewFileGenerator(renderer, "/test", "github.com/test/project", false, tt.useGin, []string{"user"})
+			fg := NewFileGenerator(renderer, "/test", "github.com/test/project", false, tt.useGin, false, []string{"user"})
 
 			result := fg.getRoutesTemplate()
 			if result != tt.expected {
@@ -205,7 +205,7 @@ func TestFileGenerator_GetMainTemplate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var mockFS embed.FS
 			renderer := template.NewRenderer(mockFS)
-			fg := NewFileGenerator(renderer, "/test", "github.com/test/project", tt.isMonolith, tt.useGin, []string{"user"})
+			fg := NewFileGenerator(renderer, "/test", "github.com/test/project", tt.isMonolith, tt.useGin, false, []string{"user"})
 
 			result := fg.getMainTemplate()
 			if result != tt.expected {
@@ -268,7 +268,7 @@ func TestFileGenerator_PrepareTemplateData(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var mockFS embed.FS
 			renderer := template.NewRenderer(mockFS)
-			fg := NewFileGenerator(renderer, "/test", "github.com/test/project", tt.isMonolith, tt.useGin, []string{"user"})
+			fg := NewFileGenerator(renderer, "/test", "github.com/test/project", tt.isMonolith, tt.useGin, false, []string{"user"})
 
 			result := fg.prepareTemplateData(tt.packageName, tt.entityName)
 
@@ -299,7 +299,7 @@ func TestFileGenerator_GenerateFiles(t *testing.T) {
 	tempDir := t.TempDir()
 	var mockFS embed.FS
 	renderer := template.NewRenderer(mockFS)
-	fg := NewFileGenerator(renderer, tempDir, "github.com/test/project", false, false, []string{"user"})
+	fg := NewFileGenerator(renderer, tempDir, "github.com/test/project", false, false, false, []string{"user"})
 
 	// Test file generation (this will fail due to missing templates, but we can test the structure)
 	err := fg.GenerateFiles("user")

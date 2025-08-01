@@ -9,36 +9,34 @@ import (
 	"github.com/indalyadav56/gogen/internal/template"
 )
 
-// File represents a file to be created
 type File struct {
 	Path         string
 	Package      string
 	TemplateName string
 }
 
-// FileGenerator handles file generation
 type FileGenerator struct {
 	renderer    *template.Renderer
 	projectRoot string
 	moduleName  string
 	isMonolith  bool
 	useGin      bool
+	useAuth     bool
 	entities    []string
 }
 
-// NewFileGenerator creates a new file generator
-func NewFileGenerator(renderer *template.Renderer, projectRoot, moduleName string, isMonolith, useGin bool, entities []string) *FileGenerator {
+func NewFileGenerator(renderer *template.Renderer, projectRoot, moduleName string, isMonolith, useGin, useAuth bool, entities []string) *FileGenerator {
 	return &FileGenerator{
 		renderer:    renderer,
 		projectRoot: projectRoot,
 		moduleName:  moduleName,
 		isMonolith:  isMonolith,
 		useGin:      useGin,
+		useAuth:     useAuth,
 		entities:    entities,
 	}
 }
 
-// GenerateFiles creates all project files for the given entity
 func (fg *FileGenerator) GenerateFiles(entityName string) error {
 	files := fg.getFileList(entityName)
 	
@@ -51,7 +49,6 @@ func (fg *FileGenerator) GenerateFiles(entityName string) error {
 	return nil
 }
 
-// getFileList returns the list of files to create
 func (fg *FileGenerator) getFileList(entityName string) []File {
 	if fg.isMonolith {
 		return fg.getMonolithFileList(entityName)
@@ -59,9 +56,8 @@ func (fg *FileGenerator) getFileList(entityName string) []File {
 	return fg.getMicroserviceFileList(entityName)
 }
 
-// getMicroserviceFileList returns files for microservice architecture
 func (fg *FileGenerator) getMicroserviceFileList(entityName string) []File {
-	return []File{
+	files := []File{
 		{Path: "cmd/main.go", Package: "main", TemplateName: "main.tmpl"},
 		{Path: "config/config.go", Package: "config", TemplateName: "config.tmpl"},
 		{Path: "pkg/logger/logger.go", Package: "logger", TemplateName: "logger.tmpl"},
@@ -72,8 +68,8 @@ func (fg *FileGenerator) getMicroserviceFileList(entityName string) []File {
 		{Path: "internal/domain/repository/repository.go", Package: "repository", TemplateName: "repository.tmpl"},
 
 		{Path: "internal/application/" + fmt.Sprintf("%s_service.go", strings.ToLower(entityName)), Package: "application", TemplateName: "service.tmpl"},
-		{Path: "internal/interface/http/v1/routes/routes.go", Package: "routes", TemplateName: "routes.tmpl"},
-		{Path: "internal/interface/http/v1/handlers/" + fmt.Sprintf("%s_handler.go", strings.ToLower(entityName)), Package: "handlers", TemplateName: "handler.tmpl"},
+		{Path: "internal/interface/http/v1/routes/routes.go", Package: "routes", TemplateName: fg.getRoutesTemplate()},
+		{Path: "internal/interface/http/v1/handlers/" + fmt.Sprintf("%s_handler.go", strings.ToLower(entityName)), Package: "handlers", TemplateName: fg.getHandlerTemplate()},
 		{Path: "internal/interface/http/middlewares/auth_middleware.go", Package: "middlewares"},
 
 		{Path: "internal/infrastructure/postgres/postgres.go", Package: "postgres", TemplateName: "postgres_repository.tmpl"},
@@ -88,6 +84,51 @@ func (fg *FileGenerator) getMicroserviceFileList(entityName string) []File {
 		{Path: "Dockerfile", Package: "", TemplateName: "docker.tmpl"},
 		{Path: "Taskfile.yaml", Package: "", TemplateName: "taskfile.tmpl"},
 	}
+
+	// Add auth-related files if UseAuth is enabled
+	if fg.useAuth {
+		authFiles := []File{
+			// Auth entities
+			{Path: "internal/domain/entity/user.go", Package: "entity", TemplateName: "auth_user_entity.tmpl"},
+			{Path: "internal/domain/entity/role.go", Package: "entity", TemplateName: "auth_role_entity.tmpl"},
+			{Path: "internal/domain/entity/permission.go", Package: "entity", TemplateName: "auth_permission_entity.tmpl"},
+			
+			// Auth repositories
+			{Path: "internal/domain/repository/user_repository.go", Package: "repository", TemplateName: "auth_user_repository.tmpl"},
+			{Path: "internal/domain/repository/role_repository.go", Package: "repository", TemplateName: "auth_role_repository.tmpl"},
+			{Path: "internal/domain/repository/permission_repository.go", Package: "repository", TemplateName: "auth_permission_repository.tmpl"},
+			
+			// Auth services
+			{Path: "internal/application/auth_service.go", Package: "application", TemplateName: "auth_service.tmpl"},
+			{Path: "internal/application/user_service.go", Package: "application", TemplateName: "auth_user_service.tmpl"},
+			{Path: "internal/application/role_service.go", Package: "application", TemplateName: "auth_role_service.tmpl"},
+			
+			// Auth handlers
+			{Path: "internal/interface/http/v1/handlers/auth_handler.go", Package: "handlers", TemplateName: fg.getHandlerTemplate()},
+			{Path: "internal/interface/http/v1/handlers/user_handler.go", Package: "handlers", TemplateName: fg.getHandlerTemplate()},
+			{Path: "internal/interface/http/v1/handlers/role_handler.go", Package: "handlers", TemplateName: fg.getHandlerTemplate()},
+			
+			// Auth routes
+			{Path: "internal/interface/http/v1/routes/auth_routes.go", Package: "routes", TemplateName: fg.getRoutesTemplate()},
+			{Path: "internal/interface/http/v1/routes/role_routes.go", Package: "routes", TemplateName: fg.getRoutesTemplate()},
+			
+			// Auth infrastructure
+			{Path: "internal/infrastructure/postgres/user_postgres.go", Package: "postgres", TemplateName: "auth_user_postgres.tmpl"},
+			{Path: "internal/infrastructure/postgres/role_postgres.go", Package: "postgres", TemplateName: "auth_role_postgres.tmpl"},
+			{Path: "internal/infrastructure/postgres/permission_postgres.go", Package: "postgres", TemplateName: "auth_permission_postgres.tmpl"},
+			
+			// Auth middleware and utilities
+			{Path: "pkg/auth/jwt.go", Package: "auth", TemplateName: "auth_jwt.tmpl"},
+			{Path: "pkg/auth/password.go", Package: "auth", TemplateName: "auth_password.tmpl"},
+			{Path: "pkg/auth/rbac.go", Package: "auth", TemplateName: "auth_rbac.tmpl"},
+			
+			// Auth migrations
+			{Path: "migrations/001_create_auth_tables.sql", Package: "", TemplateName: "auth_migration.tmpl"},
+		}
+		files = append(files, authFiles...)
+	}
+
+	return files
 }
 
 // getMonolithFileList returns files for monolith bounded context architecture
@@ -99,17 +140,13 @@ func (fg *FileGenerator) getMonolithFileList(entityName string) []File {
 		{Path: "pkg/logger/logger.go", Package: "logger", TemplateName: "logger.tmpl"},
 		{Path: "pkg/db/db.go", Package: "db", TemplateName: "db.tmpl"},
 		
-		// Shared components
-		{Path: "internal/shared/middleware/auth.go", Package: "middleware", TemplateName: ""},
+		// Shared components (non-auth related)
 		{Path: "internal/shared/dto/common.go", Package: "dto", TemplateName: ""},
 		{Path: "internal/shared/utils/utils.go", Package: "utils", TemplateName: ""},
+		{Path: "internal/shared/middleware/middleware.go", Package: "middleware", TemplateName: "auth_middleware.tmpl"},
 		
 		{Path: ".gitignore", Package: "", TemplateName: ""},
 		{Path: "Dockerfile", Package: "", TemplateName: "docker.tmpl"},
-
-		// DTO
-		{Path: "internal/"+entityName+"/interface/http/v1/dto/request.go", Package: "dto", TemplateName: ""},
-		{Path: "internal/"+entityName+"/interface/http/v1/dto/response.go", Package: "dto", TemplateName: ""},
 	}
 	
 	// If no entity specified, create example bounded context
@@ -136,6 +173,99 @@ func (fg *FileGenerator) getMonolithFileList(entityName string) []File {
 		// Infrastructure layer - database implementations, external APIs
 		{Path: entityPath + "/infrastructure/postgres/postgres.go", Package: "postgres", TemplateName: "postgres_repository.tmpl"},
 		
+		// DTO
+		{Path: entityPath + "/interface/http/v1/dto/request.go", Package: "dto", TemplateName: ""},
+		{Path: entityPath + "/interface/http/v1/dto/response.go", Package: "dto", TemplateName: ""},
+	}
+	
+	// Add auth-related bounded contexts if UseAuth is enabled
+	if fg.useAuth {
+		// JWT utilities in pkg
+		authUtilities := []File{
+			{Path: "pkg/auth/jwt.go", Package: "auth", TemplateName: "jwt_utils.tmpl"},
+			{Path: "migrations/000001_create_auth_tables.up.sql", Package: "", TemplateName: "auth_migration.tmpl"},
+		}
+		
+		// Auth bounded context (authentication/authorization logic)
+		authPath := "internal/auth"
+		authFiles := []File{
+			// Application layer
+			{Path: authPath + "/application/auth_service.go", Package: "application", TemplateName: "auth_service.tmpl"},
+			
+			// Interface layer
+			{Path: authPath + "/interface/http/v1/handlers/auth_handler.go", Package: "handlers", TemplateName: "auth_handler.tmpl"},
+			{Path: authPath + "/interface/http/v1/routes/auth_routes.go", Package: "routes", TemplateName: "auth_routes.tmpl"},
+			{Path: authPath + "/interface/http/v1/dto/auth_request.go", Package: "dto", TemplateName: "auth_request_dto.tmpl"},
+			{Path: authPath + "/interface/http/v1/dto/auth_response.go", Package: "dto", TemplateName: "auth_response_dto.tmpl"},
+		}
+		
+		// User bounded context (user management)
+		userPath := "internal/user"
+		userFiles := []File{
+			// Domain layer
+			{Path: userPath + "/domain/entity/user.go", Package: "entity", TemplateName: "user_entity.tmpl"},
+			{Path: userPath + "/domain/repository/user_repository.go", Package: "repository", TemplateName: "user_repository.tmpl"},
+			
+			// Application layer
+			{Path: userPath + "/application/user_service.go", Package: "application", TemplateName: "user_service.tmpl"},
+			
+			// Interface layer
+			{Path: userPath + "/interface/http/v1/handlers/user_handler.go", Package: "handlers", TemplateName: "user_handler.tmpl"},
+			{Path: userPath + "/interface/http/v1/routes/user_routes.go", Package: "routes", TemplateName: "auth_routes.tmpl"},
+			{Path: userPath + "/interface/http/v1/dto/user_request.go", Package: "dto", TemplateName: "auth_request_dto.tmpl"},
+			{Path: userPath + "/interface/http/v1/dto/user_response.go", Package: "dto", TemplateName: "auth_response_dto.tmpl"},
+			
+			// Infrastructure layer
+			{Path: userPath + "/infrastructure/postgres/user_postgres.go", Package: "postgres", TemplateName: "user_postgres.tmpl"},
+		}
+		
+		// Role bounded context (role management)
+		rolePath := "internal/role"
+		roleFiles := []File{
+			// Domain layer
+			{Path: rolePath + "/domain/entity/role.go", Package: "entity", TemplateName: "role_entity.tmpl"},
+			{Path: rolePath + "/domain/repository/role_repository.go", Package: "repository", TemplateName: "role_repository.tmpl"},
+			
+			// Application layer
+			{Path: rolePath + "/application/role_service.go", Package: "application", TemplateName: "role_service.tmpl"},
+			
+			// Interface layer
+			{Path: rolePath + "/interface/http/v1/handlers/role_handler.go", Package: "handlers", TemplateName: "role_handler.tmpl"},
+			{Path: rolePath + "/interface/http/v1/routes/role_routes.go", Package: "routes", TemplateName: "role_routes.tmpl"},
+			{Path: rolePath + "/interface/http/v1/dto/role_request.go", Package: "dto", TemplateName: "auth_request_dto.tmpl"},
+			{Path: rolePath + "/interface/http/v1/dto/role_response.go", Package: "dto", TemplateName: "auth_response_dto.tmpl"},
+			
+			// Infrastructure layer
+			{Path: rolePath + "/infrastructure/postgres/role_postgres.go", Package: "postgres", TemplateName: "role_postgres.tmpl"},
+		}
+		
+		// Permission bounded context (permission management)
+		permissionPath := "internal/permission"
+		permissionFiles := []File{
+			// Domain layer
+			{Path: permissionPath + "/domain/entity/permission.go", Package: "entity", TemplateName: "permission_entity.tmpl"},
+			{Path: permissionPath + "/domain/repository/permission_repository.go", Package: "repository", TemplateName: "permission_repository.tmpl"},
+			
+			// Application layer
+			{Path: permissionPath + "/application/permission_service.go", Package: "application", TemplateName: "permission_service.tmpl"},
+			
+			// Interface layer
+			{Path: permissionPath + "/interface/http/v1/handlers/permission_handler.go", Package: "handlers", TemplateName: "permission_handler.tmpl"},
+			{Path: permissionPath + "/interface/http/v1/routes/permission_routes.go", Package: "routes", TemplateName: "permission_routes.tmpl"},
+			{Path: permissionPath + "/interface/http/v1/dto/permission_request.go", Package: "dto", TemplateName: "auth_request_dto.tmpl"},
+			{Path: permissionPath + "/interface/http/v1/dto/permission_response.go", Package: "dto", TemplateName: "permission_dto.tmpl"},
+			
+			// Infrastructure layer
+			{Path: permissionPath + "/infrastructure/postgres/permission_postgres.go", Package: "postgres", TemplateName: "permission_postgres.tmpl"},
+		}
+		
+		// Combine all auth-related files
+		allAuthFiles := append(authUtilities, authFiles...)
+		allAuthFiles = append(allAuthFiles, userFiles...)
+		allAuthFiles = append(allAuthFiles, roleFiles...)
+		allAuthFiles = append(allAuthFiles, permissionFiles...)
+		
+		boundedContextFiles = append(boundedContextFiles, allAuthFiles...)
 	}
 	
 	return append(files, boundedContextFiles...)
@@ -178,6 +308,7 @@ func (fg *FileGenerator) prepareTemplateData(packageName, entityName string) tem
 		Entities:    fg.entities,
 		IsMonolith:  fg.isMonolith,
 		UseGin:      fg.useGin,
+		UseAuth:     fg.useAuth,
 	}
 	
 	if fg.isMonolith && entityName != "" {
@@ -199,12 +330,32 @@ func (fg *FileGenerator) prepareTemplateData(packageName, entityName string) tem
 		data.RoutesImport = fmt.Sprintf("%s/internal/interface/http/v1/routes", fg.moduleName)
 	}
 	
+	// For auth-related templates in monolith mode, set specific import paths for separate bounded contexts
+	if fg.isMonolith && fg.useAuth {
+		// Auth service needs to import from user, role, and permission bounded contexts
+		data.UserEntityImport = fmt.Sprintf("%s/internal/user/domain/entity", fg.moduleName)
+		data.UserRepositoryImport = fmt.Sprintf("%s/internal/user/domain/repository", fg.moduleName)
+		data.RoleEntityImport = fmt.Sprintf("%s/internal/role/domain/entity", fg.moduleName)
+		data.RoleRepositoryImport = fmt.Sprintf("%s/internal/role/domain/repository", fg.moduleName)
+		data.PermissionEntityImport = fmt.Sprintf("%s/internal/permission/domain/entity", fg.moduleName)
+		data.PermissionRepositoryImport = fmt.Sprintf("%s/internal/permission/domain/repository", fg.moduleName)
+		data.AuthServiceImport = fmt.Sprintf("%s/internal/auth/application", fg.moduleName)
+		data.UserServiceImport = fmt.Sprintf("%s/internal/user/application", fg.moduleName)
+		data.RoleServiceImport = fmt.Sprintf("%s/internal/role/application", fg.moduleName)
+	}
+	
 	return data
 }
 
 // createFile creates a single file
 func (fg *FileGenerator) createFile(file File, entityName string) error {
 	fullPath := filepath.Join(fg.projectRoot, file.Path)
+	
+	// Create directory if it doesn't exist
+	dir := filepath.Dir(fullPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", dir, err)
+	}
 	
 	// Prepare template data
 	templateData := fg.prepareTemplateData(file.Package, entityName)
@@ -213,7 +364,14 @@ func (fg *FileGenerator) createFile(file File, entityName string) error {
 	if file.TemplateName != "" && entityName != "" {
 		templatePath := "templates/" + file.TemplateName
 		return fg.renderer.RenderToFile(templatePath, fullPath, templateData)
-	} else if file.TemplateName == "db.tmpl" || file.TemplateName == "logger.tmpl" {
+	} else if file.TemplateName == "db.tmpl" || file.TemplateName == "logger.tmpl" || 
+		strings.HasPrefix(file.TemplateName, "auth_") ||
+		strings.HasSuffix(file.TemplateName, "_entity.tmpl") ||
+		strings.HasSuffix(file.TemplateName, "_service.tmpl") ||
+		strings.HasSuffix(file.TemplateName, "_handler.tmpl") ||
+		strings.HasSuffix(file.TemplateName, "_repository.tmpl") ||
+		strings.HasSuffix(file.TemplateName, "_postgres.tmpl") ||
+		file.TemplateName == "jwt_utils.tmpl" {
 		templatePath := "templates/" + file.TemplateName
 		return fg.renderer.RenderToFile(templatePath, fullPath, templateData)
 	} else {

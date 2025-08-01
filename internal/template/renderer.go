@@ -30,6 +30,7 @@ type Data struct {
 	Entities    []string
 	IsMonolith  bool
 	UseGin      bool
+	UseAuth     bool
 	// Import paths for different architectures
 	HandlerImport     string
 	ServiceImport     string
@@ -37,6 +38,16 @@ type Data struct {
 	EntityImport      string
 	InfraImport       string
 	RoutesImport      string
+	// Auth-specific import paths for separate bounded contexts
+	UserEntityImport      string
+	UserRepositoryImport  string
+	RoleEntityImport      string
+	RoleRepositoryImport  string
+	PermissionEntityImport      string
+	PermissionRepositoryImport  string
+	AuthServiceImport     string
+	UserServiceImport     string
+	RoleServiceImport     string
 }
 
 // RenderToFile renders a template to a file

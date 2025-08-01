@@ -23,6 +23,7 @@ type Config struct {
 	Monolith   bool
 	Entities   []string
 	UseGin     bool
+	UseAuth    bool
 }
 
 // ParseFlags parses command line flags and returns configuration
@@ -32,6 +33,7 @@ func ParseFlags() *Config {
 	moduleFlag := flag.String("module", "github.com/username/golang_project", "Go module name (e.g. github.com/user/project)")
 	monolithFlag := flag.Bool("monolith", false, "for monolith architecture")
 	ginFlag := flag.Bool("gin", false, "use Gin framework instead of Chi for HTTP routing")
+	authFlag := flag.Bool("auth", false, "generate RBAC-based authentication system with JWT")
 	
 	var entities stringSlice
 	flag.Var(&entities, "entity", "Specify one or more entity names. Example: --entity User --entity Product")
@@ -42,6 +44,7 @@ func ParseFlags() *Config {
 	config.Monolith = *monolithFlag
 	config.Entities = entities
 	config.UseGin = *ginFlag
+	config.UseAuth = *authFlag
 	
 	return config
 }

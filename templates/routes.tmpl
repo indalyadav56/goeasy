@@ -5,7 +5,7 @@ import (
 	"{{.HandlerImport}}"
 )
 
-func RegisterRoutes(r chi.Router, h handlers.{{.EntityName | ToPascalCase}}Handler) {
+func Setup{{.EntityName | ToPascalCase}}Routes(r chi.Router, h handlers.{{.EntityName | ToPascalCase}}Handler) {
 	r.Route("/v1/{{.EntityName | ToLower}}", func(r chi.Router) {
 		r.Get("/", h.Get{{.EntityName | ToPascalCase}})
 		r.Post("/", h.Create{{.EntityName | ToPascalCase}})
